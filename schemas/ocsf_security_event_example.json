@@ -1,0 +1,12 @@
+{
+  "activity_name": "Authentication",
+  "category_name": "Identity & Access Management",
+  "class_name": "Authentication Activity",
+  "severity": "high",
+  "src_endpoint": {
+    "ip": "192.168.1.25"
+  },
+  "metadata": {
+    "product_name": "auth-service"
+  }
+}

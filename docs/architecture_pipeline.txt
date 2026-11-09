@@ -1,0 +1,7 @@
+Planned pipeline:
+Data Sources -> FastAPI -> Protobuf/Avro schema -> Kafka -> OpenTelemetry/Vector -> OpenSearch + Falco -> Python Detection Engine -> Redis -> LangChain + Ollama -> Threat Modeling -> Vulnerability Analysis -> Grafana
+
+Why this matters:
+The left side collects and transports data.
+The middle layers detect threats and manage state.
+The right side explains incidents and shows them to operators.

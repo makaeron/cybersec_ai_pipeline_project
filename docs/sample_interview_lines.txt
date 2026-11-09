@@ -1,0 +1,8 @@
+Project one-liner:
+I designed a production-style AI-assisted cybersecurity event pipeline that ingests logs, detects threats, explains incidents, and surfaces operator actions in real time.
+
+Key strength:
+I kept detection deterministic with rules and scoring, and used the LLM only for triage, explanation, and next-step recommendations.
+
+Architecture line:
+FastAPI receives structured events, Kafka streams them, Redis manages fast state, OpenSearch stores searchable incidents, Python scores threats, and Ollama explains what happened in simple language.

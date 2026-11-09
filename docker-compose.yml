@@ -1,0 +1,83 @@
+version: "3.9"  # Compose file version.  
+
+services:  # Start all project services together.  
+  fastapi:  # API service for event ingestion.  
+    build: .  # Build using the local Dockerfile.  
+    container_name: cyber-fastapi  # Easy container name for debugging.  
+    env_file: .env.example  # Read local environment values.  
+    ports:  # Expose the API to the host machine.  
+      - "8000:8000"  # Map host port 8000 to container port 8000.  
+    depends_on:  # Start dependencies before FastAPI.  
+      - kafka  # FastAPI needs Kafka to publish events.  
+      - redis  # FastAPI may check Redis for dedupe or throttling.  
+      - opensearch  # FastAPI may write health information.  
+    networks:  # Put the service on the same internal network.  
+      - cyber-net  # Shared network for all services.  
+
+  consumer:  # Background consumer that reads events from Kafka.  
+    build: .  # Reuse the same Python image.  
+    container_name: cyber-consumer  # Easy container name.  
+    env_file: .env.example  # Read environment values.  
+    command: ["python", "-m", "app.consumers.event_consumer"]  # Start the consumer script.  
+    depends_on:  # Start dependencies before the consumer.  
+      - kafka  # Consumer reads from Kafka.  
+      - redis  # Consumer stores state in Redis.  
+      - opensearch  # Consumer writes to OpenSearch.  
+    networks:  # Join the same network.  
+      - cyber-net  # Shared internal network.  
+
+  zookeeper:  # Zookeeper helps Kafka manage brokers in this simple setup.  
+    image: confluentinc/cp-zookeeper:7.5.0  # Use a stable image.  
+    container_name: cyber-zookeeper  # Easy container name.  
+    environment:  # Zookeeper settings.  
+      ZOOKEEPER_CLIENT_PORT: 2181  # Default client port.  
+    networks:  # Join the internal network.  
+      - cyber-net  # Shared internal network.  
+
+  kafka:  # Kafka broker for streaming events.  
+    image: confluentinc/cp-kafka:7.5.0  # Use a stable Kafka image.  
+    container_name: cyber-kafka  # Easy container name.  
+    depends_on:  # Start Zookeeper before Kafka.  
+      - zookeeper  # Kafka depends on Zookeeper here.  
+    ports:  # Expose Kafka to the host machine.  
+      - "9092:9092"  # Host port 9092 to container port 9092.  
+    environment:  # Kafka broker settings.  
+      KAFKA_BROKER_ID: 1  # Single broker id for local setup.  
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181  # Tell Kafka where Zookeeper lives.  
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092  # Internal listener for containers.  
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1  # Single node demo value.  
+    networks:  # Join the internal network.  
+      - cyber-net  # Shared internal network.  
+
+  redis:  # Redis is used for fast state lookups.  
+    image: redis:7-alpine  # Lightweight Redis image.  
+    container_name: cyber-redis  # Easy container name.  
+    ports:  # Expose Redis to the host.  
+      - "6379:6379"  # Host port 6379 to container port 6379.  
+    networks:  # Join the internal network.  
+      - cyber-net  # Shared internal network.  
+
+  opensearch:  # OpenSearch stores and searches security events.  
+    image: opensearchproject/opensearch:2.15.0  # OpenSearch single-node image.  
+    container_name: cyber-opensearch  # Easy container name.  
+    environment:  # OpenSearch settings for local development.  
+      discovery.type: single-node  # Run as one node only.  
+      DISABLE_INSTALL_DEMO_CONFIG: "true"  # Skip demo config.  
+      DISABLE_SECURITY_PLUGIN: "true"  # Keep local setup simple.  
+      OPENSEARCH_JAVA_OPTS: "-Xms512m -Xmx512m"  # Control Java memory use.  
+    ports:  # Expose OpenSearch to the host.  
+      - "9200:9200"  # REST API port.  
+    networks:  # Join the internal network.  
+      - cyber-net  # Shared internal network.  
+
+  grafana:  # Grafana can visualize incidents and metrics.  
+    image: grafana/grafana:11.1.0  # Grafana image.  
+    container_name: cyber-grafana  # Easy container name.  
+    ports:  # Expose Grafana to the host.  
+      - "3000:3000"  # Host port 3000 to container port 3000.  
+    networks:  # Join the internal network.  
+      - cyber-net  # Shared internal network.  
+
+networks:  # Define shared Docker networks.  
+  cyber-net:  # Single internal network for local communication.  
+    driver: bridge  # Standard Docker bridge network.

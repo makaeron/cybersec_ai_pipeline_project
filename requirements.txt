@@ -1,0 +1,11 @@
+fastapi==0.116.1  # Build the ingestion API.  
+uvicorn==0.35.0  # Run the FastAPI server.  
+pydantic==2.11.7  # Validate incoming security events.  
+pydantic-settings==2.10.1  # Read settings from environment variables.  
+kafka-python==2.2.15  # Produce and consume events from Kafka.  
+redis==6.4.0  # Use Redis for dedupe and rate limiting.  
+opensearch-py==2.8.0  # Send searchable documents to OpenSearch.  
+langchain==0.3.27  # Create the LLM workflow.  
+langchain-ollama==0.3.6  # Connect LangChain with Ollama.  
+httpx==0.28.1  # Make HTTP requests when needed.  
+python-dotenv==1.1.1  # Load local .env files.

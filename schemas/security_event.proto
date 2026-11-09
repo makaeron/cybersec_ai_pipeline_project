@@ -1,0 +1,15 @@
+syntax = "proto3";  // Use modern protobuf syntax.  
+
+package cyber.security;  // Put the message in a clear package.  
+
+message SecurityEvent {  // Define the event shape.  
+  string event_id = 1;  // Unique id for every event.  
+  string timestamp = 2;  // Event time in ISO format.  
+  string source = 3;  // Source system name.  
+  string event_type = 4;  // Event category.  
+  string user_id = 5;  // Optional user id.  
+  string ip_address = 6;  // Optional IP address.  
+  string severity = 7;  // Severity from source or pre-classifier.  
+  string message = 8;  // Human-readable event message.  
+  map<string, string> metadata = 9;  // Extra fields as key-value pairs.  
+}

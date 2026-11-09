@@ -1,0 +1,18 @@
+receivers:  # Define where telemetry comes from.  
+  otlp:  # Receive OTLP data.  
+    protocols:  # Allow gRPC and HTTP protocols.  
+      grpc: {}  # Enable gRPC receiver.  
+      http: {}  # Enable HTTP receiver.  
+
+processors:  # Process telemetry before export.  
+  batch: {}  # Batch records for efficiency.  
+
+exporters:  # Decide where telemetry is sent.  
+  debug: {}  # Print telemetry to logs in local testing.  
+
+service:  # Wire receivers, processors, and exporters.  
+  pipelines:  # Define telemetry pipelines.  
+    logs:  # Create a logs pipeline.  
+      receivers: [otlp]  # Receive logs from OTLP.  
+      processors: [batch]  # Batch the logs.  
+      exporters: [debug]  # Print logs to console.

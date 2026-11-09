@@ -1,0 +1,5 @@
+- rule: Detect Shell Spawn In Container  # Rule name.  
+  desc: Detect a shell being spawned inside a container.  # Rule description.  
+  condition: container and proc.name in (bash, sh, zsh)  # Match simple shell processes in containers.  
+  output: "Shell started in container (user=%user.name command=%proc.cmdline)"  # Human-readable output.  
+  priority: WARNING  # Rule severity.
